@@ -52,8 +52,14 @@ const Home = () => {
       title: "Hazard Address by Supplier",
       dataIndex: "Status",
       key: "Status",
-      render: (item) => (
-        <Checkbox style={{ float: "center" }} onChange={onChange} />
+      render: (item, records, index) => (
+        <Checkbox
+          onChange={(e) => onChangeStatus(e.target.checked, index)}
+          style={{ float: "center" }}
+          checked={item}
+        >
+          {console.log("Staus1234", item)}
+        </Checkbox>
       ),
     },
     {
@@ -83,7 +89,7 @@ const Home = () => {
       ),
     },
     {
-      title: "Min units",
+      title: "Min Units",
       dataIndex: "min_units",
       width: 150,
       key: "min_units",
@@ -109,7 +115,7 @@ const Home = () => {
                       value={item}
                       style={{ width: 80 }}
                     />
-                    {console.log("Item", item)}
+                    {console.log("Item123", item)}
                   </Form.Item>
                 </Form>
               </Col>
@@ -143,6 +149,7 @@ const Home = () => {
                       },
                     ]}
                   >
+                    {console.log("Item Max", item)}
                     <InputNumber
                       value={item}
                       onChange={(e) => handleChangeMax(e, index)}
@@ -163,6 +170,30 @@ const Home = () => {
       title: "Duration",
       dataIndex: "duration",
       key: "duration",
+      render: (item, record, index) => (
+        <>
+          <Form>
+            <Form.Item
+              name="age"
+              rules={[
+                {
+                  type: "number",
+                  min: 159,
+                  max: 180,
+                  message: "Please enter value between 160 and 180",
+                },
+              ]}
+            >
+              {console.log("Item Max", item)}
+              <InputNumber
+                value={item}
+                onChange={(e) => handleChangeDuration(e, index)}
+                style={{ width: 80 }}
+              />
+            </Form.Item>
+          </Form>
+        </>
+      ),
     },
     {
       title: "Interval",
@@ -232,7 +263,7 @@ const Home = () => {
     console.log("Clicked", index);
     let newData = [...data];
     newData.splice(index, 0, data[index]);
-    // newData[index + 1] = { ...data[index + 1], isDelete: true };
+    newData[index + 1] = { ...data[index + 1], isDelete: true };
     setData(newData);
     console.log("New new data", newData);
   };
@@ -256,18 +287,33 @@ const Home = () => {
     // console.log("New data", newData[index]);
   };
 
+  const onChangeStatus = (value, index) => {
+    console.log("Value", value);
+    let newData = [...data];
+    newData[index].Status = value;
+    setData(newData);
+    console.log("New data status", value, newData[index]);
+  };
+
   const handleChangeMin = (value, index) => {
     let newData = [...data];
     newData[index].min_units = value;
     setData(newData);
-    console.log("New data", value, newData[index]);
+    // console.log("New data", value, newData[index]);
   };
 
   const handleChangeMax = (value, index) => {
     let newData = [...data];
     newData[index].max_units = value;
     setData(newData);
-    console.log("New data", value, newData[index]);
+    // console.log("New data Max", value, newData[index]);
+  };
+
+  const handleChangeDuration = (value, index) => {
+    let newData = [...data];
+    newData[index].duration = value;
+    setData(newData);
+    // console.log("New data Max", value, newData[index]);
   };
 
   const handleChangeProcess = (value, index) => {
