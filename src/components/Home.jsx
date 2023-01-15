@@ -18,8 +18,9 @@ import newDataList from "../lib/helpers/newdata.json";
 
 const Home = () => {
   const [data, setData] = useState(dataList);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newData, setNewData] = useState(newDataList);
+  const [form] = Form.useForm();
 
   const bookingLists =
     data?.map((list, index) => ({
@@ -57,19 +58,26 @@ const Home = () => {
           onChange={(e) => onChangeStatus(e.target.checked, index)}
           style={{ float: "center" }}
           checked={item}
-        >
-          {console.log("Staus1234", item)}
-        </Checkbox>
+        ></Checkbox>
       ),
     },
     {
       title: "",
       dataIndex: "",
       key: "Status",
+      width: 70,
       render: (item, records, index) => (
         <>
-          <PlusOutlined onClick={(e) => onClickHandler(index)} />
-          {records.isDelete && <DeleteOutlined />}
+          <PlusOutlined
+            onClick={(e) => onClickHandler(index)}
+            style={{ color: "green", fontWeight: "50" }}
+          />
+          {records.isDelete && (
+            <DeleteOutlined
+              onClick={(e) => onDeleteHandler(index)}
+              style={{ color: "red", marginLeft: 10 }}
+            />
+          )}
         </>
       ),
     },
@@ -98,7 +106,7 @@ const Home = () => {
           <Input.Group size="default">
             <Row gutter={5}>
               <Col span={16}>
-                <Form>
+                <Form style={{ marginTop: 20 }}>
                   <Form.Item
                     name="min_units"
                     rules={[
@@ -113,14 +121,17 @@ const Home = () => {
                     <InputNumber
                       onChange={(e) => handleChangeMin(e, index)}
                       value={item}
+                      max={180}
+                      min={160}
                       style={{ width: 80 }}
+                      controls={false}
                     />
                     {console.log("Item123", item)}
                   </Form.Item>
                 </Form>
               </Col>
               <Col span={8}>
-                <p>°F</p>
+                <p style={{ marginLeft: 10 }}>°F</p>
               </Col>
             </Row>
           </Input.Group>
@@ -136,7 +147,7 @@ const Home = () => {
         <div className="site-input-group-wrapper">
           <Input.Group size="default">
             <Row gutter={5}>
-              <Col span={16}>
+              <Col span={16} style={{ marginTop: 20 }}>
                 <Form>
                   <Form.Item
                     name="age"
@@ -149,17 +160,20 @@ const Home = () => {
                       },
                     ]}
                   >
-                    {console.log("Item Max", item)}
+                    {console.log("Item", item)}
                     <InputNumber
                       value={item}
                       onChange={(e) => handleChangeMax(e, index)}
+                      max={180}
+                      min={160}
                       style={{ width: 80 }}
+                      controls={false}
                     />
                   </Form.Item>
                 </Form>
               </Col>
               <Col span={8}>
-                <p>°F</p>
+                <p style={{ marginLeft: 10 }}>°F</p>
               </Col>
             </Row>
           </Input.Group>
@@ -172,26 +186,12 @@ const Home = () => {
       key: "duration",
       render: (item, record, index) => (
         <>
-          <Form>
-            <Form.Item
-              name="age"
-              rules={[
-                {
-                  type: "number",
-                  min: 159,
-                  max: 180,
-                  message: "Please enter value between 160 and 180",
-                },
-              ]}
-            >
-              {console.log("Item Max", item)}
-              <InputNumber
-                value={item}
-                onChange={(e) => handleChangeDuration(e, index)}
-                style={{ width: 80 }}
-              />
-            </Form.Item>
-          </Form>
+          <InputNumber
+            value={item}
+            onChange={(e) => handleChangeDuration(e, index)}
+            style={{ width: 80 }}
+            controls={false}
+          />
         </>
       ),
     },
@@ -221,9 +221,7 @@ const Home = () => {
               label: "hour",
             },
           ]}
-        >
-          {console.log("Item", item)}
-        </Select>
+        ></Select>
       ),
     },
     {
@@ -237,16 +235,13 @@ const Home = () => {
           {/* <Button onClick={() => router.push(`/booking/${item.id}`)}>
                 <FiEye />
               </Button> */}
-          <Button onClick={success} type="primary">
+
+          <Button type="primary" onClick={success}>
             Analyze
           </Button>
-          {/* <Button type="primary" onClick={showModal}>
-              Analyze
-            </Button> */}
-
-          {/* <Button disabled={true}>
-              <AiOutlinePrinter />
-            </Button> */}
+          <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <p>Pathogens Controlled</p>
+          </Modal>
         </Space>
       ),
     },
@@ -260,71 +255,64 @@ const Home = () => {
   });
 
   const onClickHandler = (index) => {
-    console.log("Clicked", index);
     let newData = [...data];
     newData.splice(index, 0, data[index]);
-    newData[index + 1] = { ...data[index + 1], isDelete: true };
+    newData[index + 1] = { ...data[index], isDelete: true };
     setData(newData);
-    console.log("New new data", newData);
   };
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const onDeleteHandler = (index) => {
+    let newData = [...data];
+    newData.splice(index, 1);
+    setData(newData);
   };
 
   const handleChange = (value, index) => {
     let newData = [...data];
     newData[index].interval = value;
     setData(newData);
-    // console.log("New data", newData[index]);
   };
 
   const onChangeStatus = (value, index) => {
-    console.log("Value", value);
     let newData = [...data];
     newData[index].Status = value;
     setData(newData);
-    console.log("New data status", value, newData[index]);
   };
 
   const handleChangeMin = (value, index) => {
     let newData = [...data];
     newData[index].min_units = value;
     setData(newData);
-    // console.log("New data", value, newData[index]);
   };
 
   const handleChangeMax = (value, index) => {
     let newData = [...data];
     newData[index].max_units = value;
     setData(newData);
-    // console.log("New data Max", value, newData[index]);
   };
 
   const handleChangeDuration = (value, index) => {
     let newData = [...data];
     newData[index].duration = value;
     setData(newData);
-    // console.log("New data Max", value, newData[index]);
   };
 
   const handleChangeProcess = (value, index) => {
     let newData = [...data];
     newData[index].process = value;
     setData(newData);
-    // console.log("New data", newData[index]);
   };
 
-  const onChange = (value) => {
-    console.log("SelectedValue", value);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    let newData = [...data];
+    setData(newData);
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
   };
 
   const success = () => {
@@ -337,19 +325,6 @@ const Home = () => {
     <div style={{ margin: 30 }}>
       <h1>Biological Hazard</h1>
       <Table
-        rowSelection={{}}
-        expandable={{
-          expandedRowRender: (record) => (
-            <p
-              style={{
-                margin: 0,
-              }}
-            >
-              {console.log(record.CategoryTitle)}
-              {record.CategoryTitle}
-            </p>
-          ),
-        }}
         // key={columns.key}
         columns={columns}
         dataSource={bookingLists}
